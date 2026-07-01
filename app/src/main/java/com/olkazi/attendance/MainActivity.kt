@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -571,7 +572,7 @@ fun ApplyLeaveDialog(
                 onPicked(String.format("%04d-%02d-%02d", year, month + 1, day))
             },
             cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        ).also { it.datePicker.minDate = cal.timeInMillis }.show()
     }
 
     AlertDialog(
@@ -579,15 +580,22 @@ fun ApplyLeaveDialog(
         title = { Text("Apply for Leave") },
         text = {
             Column {
+                // ── Leave type dropdown ────────────────────────────────────
+                Text("Leave Type", fontSize = 12.sp, color = Color.Gray)
+                Spacer(Modifier.height(4.dp))
                 Box {
-                    OutlinedTextField(
-                        value = selectedType?.name ?: "Select leave type",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Leave Type") },
-                        modifier = Modifier.fillMaxWidth().clickable { typeMenuExpanded = true },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) }
-                    )
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, Color.Gray, androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+                            .clickable { typeMenuExpanded = true }
+                            .padding(horizontal = 12.dp, vertical = 14.dp)
+                    ) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text(selectedType?.let { "${it.name} (${it.remaining} days left)" } ?: "Select leave type")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    }
                     DropdownMenu(expanded = typeMenuExpanded, onDismissRequest = { typeMenuExpanded = false }) {
                         leaveTypes.forEach { lt ->
                             DropdownMenuItem(
@@ -597,27 +605,54 @@ fun ApplyLeaveDialog(
                         }
                     }
                 }
-                Spacer(Modifier.height(10.dp))
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── Start date ────────────────────────────────────────────
+                Text("Start Date", fontSize = 12.sp, color = Color.Gray)
+                Spacer(Modifier.height(4.dp))
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Gray, androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+                        .clickable { pickDate { startDate = it } }
+                        .padding(horizontal = 12.dp, vertical = 14.dp)
+                ) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (startDate.isBlank()) "Pick start date" else startDate, color = if (startDate.isBlank()) Color.Gray else Color.Unspecified)
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── End date ──────────────────────────────────────────────
+                Text("End Date", fontSize = 12.sp, color = Color.Gray)
+                Spacer(Modifier.height(4.dp))
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Gray, androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+                        .clickable { pickDate { endDate = it } }
+                        .padding(horizontal = 12.dp, vertical = 14.dp)
+                ) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (endDate.isBlank()) "Pick end date" else endDate, color = if (endDate.isBlank()) Color.Gray else Color.Unspecified)
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── Reason ────────────────────────────────────────────────
                 OutlinedTextField(
-                    value = startDate, onValueChange = {}, readOnly = true,
-                    label = { Text("Start Date") },
-                    modifier = Modifier.fillMaxWidth().clickable { pickDate { startDate = it } },
-                    trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) }
-                )
-                Spacer(Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = endDate, onValueChange = {}, readOnly = true,
-                    label = { Text("End Date") },
-                    modifier = Modifier.fillMaxWidth().clickable { pickDate { endDate = it } },
-                    trailingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) }
-                )
-                Spacer(Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = reason, onValueChange = { reason = it },
+                    value = reason,
+                    onValueChange = { reason = it },
                     label = { Text("Reason") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2
                 )
+
                 resultMsg?.let {
                     Spacer(Modifier.height(8.dp))
                     Text(it, color = if (resultIsError) Color(0xFFC0392B) else Color(0xFF1B5E3A), fontSize = 13.sp)
