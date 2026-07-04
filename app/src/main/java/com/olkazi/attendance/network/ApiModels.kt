@@ -144,3 +144,18 @@ data class AnnouncementsResponse(
     val error: String? = null,
     val announcements: List<Announcement> = emptyList()
 )
+
+data class BirthdayEntry(
+    @SerializedName("first_name") val firstName: String,
+    @SerializedName("last_name") val lastName: String,
+    val department: String?,
+    // True if this entry is the logged-in user's own birthday — lets the UI
+    // show "Happy Birthday to you!" instead of a third-person line for them.
+    @SerializedName("is_self") val isSelf: Boolean = false
+)
+
+data class BirthdaysResponse(
+    val success: Boolean,
+    val error: String? = null,
+    val birthdays: List<BirthdayEntry> = emptyList()
+)
