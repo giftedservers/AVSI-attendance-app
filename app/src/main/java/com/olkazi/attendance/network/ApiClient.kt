@@ -53,7 +53,7 @@ class SessionManager(context: Context) {
 
 object ApiClient {
 
-    fun create(baseUrl: String): OlkaziApi {
+    fun create(baseUrl: String): AVSIApi {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         }
@@ -70,6 +70,6 @@ object ApiClient {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-            .create(OlkaziApi::class.java)
+            .create(AVSIApi::class.java)
     }
 }
