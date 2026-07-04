@@ -9,7 +9,7 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.OlkaziAttendance"
+        android:theme="@style/Theme.AVSIAttendance"
         android:usesCleartextTraffic="false">
 
         <activity
