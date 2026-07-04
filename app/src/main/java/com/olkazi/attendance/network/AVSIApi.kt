@@ -7,7 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface OlkaziApi {
+interface AVSIApi {
 
     @FormUrlEncoded
     @POST("auth.php")
@@ -90,4 +90,10 @@ interface OlkaziApi {
         @Header("Authorization") authHeader: String,
         @Query("action") action: String = "list"
     ): AnnouncementsResponse
+
+    @GET("birthdays.php")
+    suspend fun birthdaysToday(
+        @Header("Authorization") authHeader: String,
+        @Query("action") action: String = "today"
+    ): BirthdaysResponse
 }
