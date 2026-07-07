@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -1041,10 +1042,11 @@ fun TimesheetScreen(
 // disabled on days blocked by a public holiday or full-day approved leave
 // (leave cells are never blocked). ─────────────────────────────────────
 
-private const val GRID_LABEL_WIDTH_DP = 118
-private const val GRID_CELL_WIDTH_DP = 42
-private const val GRID_CELL_HEIGHT_DP = 40
+private const val GRID_LABEL_WIDTH_DP = 128
+private const val GRID_CELL_WIDTH_DP = 56
+private const val GRID_CELL_HEIGHT_DP = 48
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TimesheetGridEditor(
     api: com.olkazi.attendance.network.OlkaziApi,
@@ -1097,7 +1099,7 @@ fun TimesheetGridEditor(
         loading = false
     }
 
-    Column(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().imePadding()) {
         Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onDone) { Icon(Icons.Default.ArrowBack, contentDescription = "Back") }
             Text("Submit — ${monthName(month)} $year", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -1143,11 +1145,20 @@ fun TimesheetGridEditor(
                     Box(Modifier.fillMaxWidth().padding(20.dp)) {
                         Text("No active projects or leave types are configured — contact HR.", color = Color(0xFFC0392B))
                     }
+                } else {
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp),
+                        horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("Swipe the grid to see more days", fontSize = 11.sp, color = Color.Gray)
+                    }
                 }
 
                 LazyColumn(Modifier.weight(1f)) {
-                    item {
-                        Row(Modifier.fillMaxWidth()) {
+                    stickyHeader {
+                        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)) {
                             Box(Modifier.width(GRID_LABEL_WIDTH_DP.dp).height(GRID_CELL_HEIGHT_DP.dp))
                             Row(Modifier.horizontalScroll(hScroll)) {
                                 days.forEach { d ->
@@ -1158,8 +1169,8 @@ fun TimesheetGridEditor(
                                 }
                             }
                         }
+                        HorizontalDivider()
                     }
-                    item { HorizontalDivider() }
                     items(fd.projects) { p ->
                         GridRow(
                             label = p.code,
@@ -1306,10 +1317,11 @@ fun GridRow(
             Modifier
                 .width(GRID_LABEL_WIDTH_DP.dp)
                 .height(GRID_CELL_HEIGHT_DP.dp)
-                .padding(horizontal = 6.dp),
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 8.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(label, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(label, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
         Row(Modifier.horizontalScroll(hScroll)) {
             days.forEach { d ->
@@ -1341,17 +1353,17 @@ fun GridCell(value: String, enabled: Boolean, onValueChange: (String) -> Unit) {
                 },
                 singleLine = true,
                 textStyle = androidx.compose.ui.text.TextStyle(
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = Color(0xFF1B5E3A)
                 ),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
                 ),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
             )
         } else {
-            Text("—", fontSize = 12.sp, color = Color.LightGray)
+            Text("—", fontSize = 14.sp, color = Color.LightGray)
         }
     }
 }
