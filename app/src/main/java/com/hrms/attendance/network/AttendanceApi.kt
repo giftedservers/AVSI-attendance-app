@@ -98,32 +98,4 @@ interface AttendanceApi {
         @Header("Authorization") authHeader: String,
         @Query("action") action: String = "today"
     ): BirthdaysResponse
-
-    // ── Timesheet — NEW ──────────────────────────────────────────────────
-
-    @GET("timesheet.php")
-    suspend fun timesheetFormData(
-        @Header("Authorization") authHeader: String,
-        @Query("action") action: String = "form_data",
-        @Query("month") month: Int,
-        @Query("year") year: Int
-    ): TimesheetFormData
-
-    @GET("timesheet.php")
-    suspend fun myTimesheets(
-        @Header("Authorization") authHeader: String,
-        @Query("action") action: String = "my_timesheets"
-    ): MyTimesheetsResponse
-
-    @FormUrlEncoded
-    @POST("timesheet.php")
-    suspend fun submitTimesheet(
-        @Header("Authorization") authHeader: String,
-        @Field("action") action: String = "submit",
-        @Field("month") month: Int,
-        @Field("year") year: Int,
-        @Field("location") location: String,
-        @Field("title") title: String,
-        @Field("entries_json") entriesJson: String
-    ): SubmitTimesheetResponse
 }
