@@ -1,0 +1,57 @@
+name: Build Android app
+
+# Runs automatically on every push to main, and can also be triggered
+# manually from the Actions tab (Run workflow button).
+#
+# This is a plain native Android (Kotlin) app, so the build is simple:
+# GitHub's runner + a pinned Gradle version + Java. No Expo, no EAS, no
+# extra accounts, no native-module version matrix to fight — the same
+# kind of build that works for any straightforward Android project.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build debug APK
+        run: gradle assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk ./maa-invest-app.apk
+
+      - name: Upload as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maa-invest-app
+          path: maa-invest-app.apk
+
+      - name: Publish as a GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: MAA Invest Android build ${{ github.run_number }}
+          files: ./maa-invest-app.apk
+          body: |
+            Automatic Android build from commit ${{ github.sha }}.
+            Download maa-invest-app.apk below and drop it into your
+            website's downloads/ folder for the QR-code install flow.
